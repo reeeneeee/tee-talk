@@ -1,0 +1,28 @@
+# Build artifacts
+/target/
+
+# Cargo.lock is typically committed for binaries, but ignored for libraries
+# Since this is a binary, we'll keep it (don't ignore)
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (may contain secrets)
+.env
+.env.local
+
+# Copyrighted text (not for public distribution)
+readings.txt
+
+# Build artifacts (disk images)
+disk.raw
+disk.raw.tar.gz
+verity-manifest.json

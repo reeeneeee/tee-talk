@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: tee-talk-linux-x86_64
+            binary: tee-talk
+          - os: macos-latest
+            artifact: tee-talk-macos-arm64
+            binary: tee-talk
+          - os: windows-latest
+            artifact: tee-talk-windows-x86_64
+            binary: tee-talk.exe
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Decrypt readings (Unix)
+        if: runner.os != 'Windows'
+        run: echo "$READINGS_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --decrypt readings.txt.gpg > readings.txt
+        env:
+          READINGS_PASSPHRASE: ${{ secrets.READINGS_PASSPHRASE }}
+
+      - name: Decrypt readings (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: echo "$READINGS_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --decrypt readings.txt.gpg > readings.txt
+        env:
+          READINGS_PASSPHRASE: ${{ secrets.READINGS_PASSPHRASE }}
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        run: tar czf ${{ matrix.artifact }}.tar.gz -C target/release ${{ matrix.binary }}
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: cd target/release && 7z a ../../${{ matrix.artifact }}.zip ${{ matrix.binary }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/**/*

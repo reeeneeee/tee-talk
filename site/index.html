@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tee talk</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    ::selection { background: #ff5ec4; color: #a6ff47; }
+    ::-moz-selection { background: #ff5ec4; color: #a6ff47; }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #000;
+      color: #000;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.8;
+      font-size: 0.95rem;
+      transition: color 2s ease, background 2s ease;
+    }
+    body.lit {
+      color: #a6ff47;
+      background: #000;
+    }
+    main {
+      max-width: 540px;
+      width: 100%;
+      padding: 5rem 1.5rem 3rem;
+    }
+    .hint {
+      text-align: center;
+      padding: 5rem 0 0.5rem;
+      font-size: 3rem;
+      cursor: default;
+      transition: transform 0.6s ease;
+    }
+    .hint:hover { transform: scale(1.1); }
+    .hint-text {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: rgba(255, 243, 180, 0);
+      transition: color 3s ease;
+      padding-bottom: 2.5rem;
+    }
+    @media (hover: none) {
+      .hint-text { color: rgba(255, 243, 180, 0.2); }
+      .hint {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        padding: 0;
+        font-size: 4rem;
+        z-index: 100;
+      }
+      .hint-text { color: transparent; }
+      .light-btn { display: none; }
+      main { padding-top: 3rem; }
+    }
+    body:has(.hint:hover) .hint-text { color: rgba(255, 243, 180, 0.15); }
+    body:not(.lit) { transition: color 2.5s ease; }
+    a { color: #000; transition: color 2s ease; }
+    a::selection { color: #ffcfc4; }
+    a::-moz-selection { color: #ffcfc4; }
+    body:has(.hint:hover):not(.lit) { color: rgba(255, 243, 180, 0.06); }
+    body:has(.hint:hover):not(.lit) a { color: rgba(255, 243, 180, 0.06); }
+    body.lit a { color: #ff5ec4; }
+    body.lit a:hover { color: #ffcfc4; }
+    body.lit .hint-text { color: transparent; }
+    body.lit code {
+      background: rgba(166, 255, 71, 0.1);
+      color: #ffcfc4;
+    }
+    body.lit pre {
+      background: rgba(166, 255, 71, 0.1);
+      color: #ffcfc4;
+    }
+    body.lit pre code { background: none; }
+    body.lit .muted { color: rgba(166, 255, 71, 0.5); }
+    body.lit .muted a { color: rgba(166, 255, 71, 0.5); }
+    body.lit .muted a:hover { color: #ff5ec4; }
+    body.lit .legal { color: rgba(166, 255, 71, 0.35); }
+    body.lit .legal a { color: rgba(166, 255, 71, 0.35); }
+    body.lit .legal a:hover { color: #ff5ec4; }
+    body.lit footer { color: rgba(166, 255, 71, 0.25); }
+    body.lit footer a { color: rgba(166, 255, 71, 0.25); }
+    body.lit footer a:hover { color: #ff5ec4; }
+    body.lit h2 { color: #ff5ec4; }
+    body.lit .light-btn { opacity: 1; }
+    body.lit .faq strong { color: #ff5ec4; }
+    body.lit main > p > strong { color: #ff5ec4; }
+
+    h2 {
+      font-size: 1.05rem;
+      font-weight: normal;
+      font-style: italic;
+      color: #000;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      transition: color 2s ease;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      background: #000;
+      padding: 0.5rem 0;
+      z-index: 10;
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      h2 { top: 2rem; }
+    }
+    p, li { margin-bottom: 0.75rem; }
+    ol {
+      list-style: none;
+      counter-reset: step;
+      padding: 0;
+    }
+    ol li {
+      counter-increment: step;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    ol li::before {
+      content: counter(step) ".";
+      position: absolute;
+      left: 0;
+    }
+    .keyword {
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+    .phone {
+      font-family: monospace;
+    }
+    code {
+      font-family: monospace;
+      font-size: 0.9em;
+      letter-spacing: 0.02em;
+      transition: background 2s ease, color 2s ease;
+    }
+    pre {
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      transition: background 2s ease, color 2s ease;
+    }
+    pre code { font-size: 0.85rem; }
+    strong { font-weight: normal; font-style: italic; }
+    .muted {
+      font-size: 0.88rem;
+      color: #000;
+      transition: color 2s ease;
+    }
+    .muted a { color: #000; transition: color 2s ease; }
+    .legal {
+      font-size: 0.8rem;
+      color: #000;
+      transition: color 2s ease;
+    }
+    .legal p { margin-bottom: 0.4rem; }
+    .legal a { color: #000; transition: color 2s ease; }
+    footer {
+      text-align: center;
+      padding: 1rem 1.5rem 2rem;
+      font-size: 0.7rem;
+      color: #000;
+      transition: color 2s ease;
+    }
+    footer a { color: #000; text-decoration: none; transition: color 2s ease; }
+
+    .light-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 100;
+      padding: 0.5rem;
+      line-height: 1;
+    }
+    .light-btn:hover { opacity: 1; transform: scale(1.2); }
+
+    .minimap {
+      position: fixed;
+      left: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      list-style: none;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transition: opacity 2s ease;
+      z-index: 50;
+    }
+    body.lit .minimap { opacity: 1; }
+    .minimap li { margin-bottom: 0.6rem; }
+    .minimap a {
+      color: rgba(166, 255, 71, 0.25);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .minimap a:hover { color: rgba(166, 255, 71, 0.6); }
+    .minimap a.active { color: #ff5ec4; }
+    body.lit .minimap a { color: rgba(166, 255, 71, 0.25); }
+    body.lit .minimap a:hover { color: rgba(166, 255, 71, 0.6); }
+    body.lit .minimap a.active { color: #ff5ec4; }
+    @media (max-width: 900px) {
+      .minimap {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        transform: none;
+        display: flex;
+        gap: 1.2rem;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        font-size: 0.6rem;
+      }
+      .minimap li { margin-bottom: 0; }
+    }
+
+    .diagram-wrap {
+      opacity: 0;
+      transition: opacity 2s ease;
+      margin: 2rem 0 0.5rem;
+    }
+    body.lit .diagram-wrap { opacity: 1; }
+    body:has(.hint:hover):not(.lit) .diagram-wrap { opacity: 0.06; }
+    @media (hover: none) {
+      body.lit .diagram-wrap { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <ul class="minimap">
+    <li><a href="#how-it-works">how it works</a></li>
+    <li><a href="#how-to-talk">how to talk</a></li>
+    <li><a href="#verify">how to verify</a></li>
+    <li><a href="#faq">faq</a></li>
+  </ul>
+
+  <button class="light-btn" onclick="document.body.classList.toggle('lit')" title="Toggle lights">💡</button>
+
+  <main>
+    <div class="hint" id="teapot">🫖</div>
+    <div class="hint-text">highlight to read</div>
+
+    <p>
+      TEE Talk is a private LLM chat. Your words are encrypted on your device
+      and decrypted only inside a hardware-isolated
+      <a href="https://cloud.google.com/confidential-computing">Trusted Execution Environment</a>.
+      No other human can read them.
+    </p>
+
+    <h2 id="how-it-works">How it works</h2>
+    <p>
+      When you connect, your client exchanges cryptographic keys with a remote server,
+      verifies it's running the exact
+      <a href="https://github.com/reeeneeee/tee-talk">open-source code</a>
+      published here on the
+      <a href="https://cloud.google.com/confidential-computing">hardware</a>
+      it claims to be, and establishes a secure channel.
+      Nothing is stored between sessions.
+      When it seems right, the AI may draw on old wisdom to help you think.
+    </p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 540 910" xmlns="http://www.w3.org/2000/svg" style="width:100%; display:block;">
+        <!-- BOXES -->
+        <rect x="5" y="5" width="175" height="770" rx="6" fill="none" stroke="#a6ff47" stroke-width="1.5"/>
+        <text x="92" y="30" text-anchor="middle" fill="#a6ff47" font-family="Georgia,serif" font-size="13">your device</text>
+        <rect x="360" y="5" width="175" height="770" rx="6" fill="none" stroke="#ff5ec4" stroke-width="2"/>
+        <rect x="366" y="11" width="163" height="758" rx="4" fill="none" stroke="rgba(255,94,196,0.3)" stroke-width="0.75"/>
+        <text x="448" y="30" text-anchor="middle" fill="#ff5ec4" font-family="Georgia,serif" font-size="13" font-style="italic">hardware TEE</text>
+
+        <!-- HANDSHAKE -->
+        <g transform="translate(0,62)">
+          <text x="92" y="0" text-anchor="middle" fill="#a6ff47" font-size="12">&#x1F511;</text>
+          <line x1="120" y1="-3" x2="420" y2="-3" stroke="rgba(166,255,71,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+          <polygon points="417,-7 425,-3 417,1" fill="rgba(166,255,71,0.3)"/>
+          <polygon points="123,-7 115,-3 123,1" fill="rgba(166,255,71,0.3)"/>
+          <text x="448" y="0" text-anchor="middle" fill="#ff5ec4" font-size="12">&#x1F511;</text>
+          <text x="270" y="16" text-anchor="middle" fill="rgba(166,255,71,0.35)" font-family="Georgia,serif" font-size="9" font-style="italic">matching keys exchanged</text>
+        </g>
+
+        <!-- R1: SEND "what is love?" + arrow on same line -->
+        <g transform="translate(0,115)">
+          <text x="92" y="0" text-anchor="middle" fill="#a6ff47" font-family="Georgia,serif" font-size="11">"what is love?"</text>
+          <line x1="188" y1="-4" x2="348" y2="-4" stroke="#a6ff47" stroke-width="1"/>
+          <polygon points="345,-8 353,-4 345,0" fill="#a6ff47"/>
+        </g>
+
+        <!-- R1: TEE LABEL -->
+        <g transform="translate(0,175)">
+          <text x="448" y="0" text-anchor="middle" fill="rgba(166,255,71,0.5)" font-family="Georgia,serif" font-size="10">AI reads and responds</text>
+        </g>
+
+        <!-- R1: RETURN "baby don't hurt me" + arrow on same line -->
+        <g transform="translate(0,215)">
+          <text x="448" y="0" text-anchor="middle" fill="#ff5ec4" font-family="Courier,monospace" font-size="11">"baby don't hurt me"</text>
+          <line x1="352" y1="-4" x2="195" y2="-4" stroke="#ff5ec4" stroke-width="1"/>
+          <polygon points="198,-8 190,-4 198,0" fill="#ff5ec4"/>
+        </g>
+
+        <!-- R1: ANNOTATIONS -->
+        <g transform="translate(0,258)">
+          <text x="92" y="0" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9" font-style="italic">stores both</text>
+          <text x="448" y="0" text-anchor="middle" fill="rgba(255,94,196,0.4)" font-family="Georgia,serif" font-size="9" font-style="italic">conversation history wiped</text>
+        </g>
+
+        <!-- SEPARATOR -->
+        <line x1="20" y1="290" x2="520" y2="290" stroke="rgba(166,255,71,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+        <!-- R2: RE-SENT HISTORY -->
+        <g transform="translate(0,320)">
+          <text x="92" y="0" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9" font-style="italic">re-sends full history:</text>
+          <text x="92" y="22" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9">"what is love?"</text>
+          <text x="92" y="40" text-anchor="middle" fill="rgba(255,94,196,0.4)" font-family="Courier,monospace" font-size="9">"baby don't hurt me"</text>
+        </g>
+
+        <!-- R2: SEND "don't hurt me" + arrow on same line -->
+        <g transform="translate(0,385)">
+          <text x="92" y="0" text-anchor="middle" fill="#a6ff47" font-family="Georgia,serif" font-size="11">"don't hurt me"</text>
+          <line x1="188" y1="-4" x2="348" y2="-4" stroke="#a6ff47" stroke-width="1"/>
+          <polygon points="345,-8 353,-4 345,0" fill="#a6ff47"/>
+        </g>
+
+        <!-- R2: TEE LABEL -->
+        <g transform="translate(0,450)">
+          <text x="448" y="0" text-anchor="middle" fill="rgba(166,255,71,0.5)" font-family="Georgia,serif" font-size="10">AI reads from scratch</text>
+          <text x="448" y="17" text-anchor="middle" fill="rgba(166,255,71,0.5)" font-family="Georgia,serif" font-size="10">and responds</text>
+        </g>
+
+        <!-- R2: RETURN "no more" + arrow on same line -->
+        <g transform="translate(0,505)">
+          <line x1="352" y1="-4" x2="195" y2="-4" stroke="#ff5ec4" stroke-width="1"/>
+          <polygon points="198,-8 190,-4 198,0" fill="#ff5ec4"/>
+          <text x="448" y="0" text-anchor="middle" fill="#ff5ec4" font-family="Courier,monospace" font-size="11">"no more"</text>
+        </g>
+
+        <!-- TEE: CONVERSATION WIPED AFTER R2 -->
+        <g transform="translate(0,540)">
+          <text x="448" y="0" text-anchor="middle" fill="rgba(255,94,196,0.4)" font-family="Georgia,serif" font-size="9" font-style="italic">conversation history wiped</text>
+        </g>
+
+        <!-- R2: FULL CONVERSATION ON LEFT + LOG OFF -->
+        <g transform="translate(0,565)">
+          <text x="92" y="0" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9">"what is love?"</text>
+          <text x="92" y="16" text-anchor="middle" fill="rgba(255,94,196,0.4)" font-family="Courier,monospace" font-size="9">"baby don't hurt me"</text>
+          <text x="92" y="32" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9">"don't hurt me"</text>
+          <text x="92" y="48" text-anchor="middle" fill="rgba(255,94,196,0.4)" font-family="Courier,monospace" font-size="9">"no more"</text>
+          <text x="92" y="72" text-anchor="middle" fill="rgba(166,255,71,0.5)" font-family="Georgia,serif" font-size="10" font-weight="bold">[human logs off]</text>
+          <text x="92" y="92" text-anchor="middle" fill="rgba(166,255,71,0.4)" font-family="Georgia,serif" font-size="9" font-style="italic">stores all</text>
+        </g>
+
+        <!-- TEE: SESSION ENDS (below left-hand chunk, which ends ~657) -->
+        <g transform="translate(0,672)">
+          <text x="448" y="0" text-anchor="middle" fill="#ff5ec4" font-family="Georgia,serif" font-size="10">session ended, memory wiped &#x2713;</text>
+          <text x="448" y="18" text-anchor="middle" fill="rgba(255,94,196,0.35)" font-size="9">&#x1F511; &#x2192; &#x1F4A8;</text>
+        </g>
+
+        <!-- SEPARATOR -->
+        <line x1="20" y1="720" x2="520" y2="720" stroke="rgba(166,255,71,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+        <!-- SUMMARY -->
+        <g transform="translate(0,745)">
+          <text x="92" y="0" text-anchor="middle" fill="rgba(166,255,71,0.6)" font-family="Georgia,serif" font-size="11" font-style="italic">keeps the full</text>
+          <text x="92" y="16" text-anchor="middle" fill="rgba(166,255,71,0.6)" font-family="Georgia,serif" font-size="11" font-style="italic">conversation</text>
+          <text x="448" y="0" text-anchor="middle" fill="rgba(255,94,196,0.6)" font-family="Georgia,serif" font-size="10" font-style="italic">no thoughts</text>
+          <text x="448" y="14" text-anchor="middle" fill="rgba(255,94,196,0.6)" font-family="Georgia,serif" font-size="10" font-style="italic">head empty</text>
+          <text x="498" y="14" text-anchor="middle" fill="rgba(255,94,196,0.5)" font-size="12">&#x1F423;</text>
+        </g>
+
+        <!-- BOTTOM -->
+        <line x1="40" y1="800" x2="500" y2="800" stroke="rgba(166,255,71,0.3)" stroke-width="1"/>
+        <text x="270" y="830" text-anchor="middle" fill="#a6ff47" font-family="Georgia,serif" font-size="16" font-style="italic">no human can read your messages</text>
+        <text x="270" y="860" text-anchor="middle" fill="#ff5ec4" font-family="Georgia,serif" font-size="13">&#x2717; your ISP &#xB7; &#x2717; the cloud provider &#xB7; &#x2717; the server operator</text>
+        <text x="270" y="890" text-anchor="middle" fill="rgba(166,255,71,0.5)" font-family="Georgia,serif" font-size="11">encryption enforced by your device &#xB7; isolation enforced by CPU hardware</text>
+      </svg>
+    </div>
+
+    <h2 id="how-to-talk">How to talk</h2>
+
+    <p style="margin-top: 2rem;"><strong>By web UI</strong> <span class="muted">(desktop only)</span></p>
+    <p>
+      Download for your platform from the
+      <a href="https://github.com/reeeneeee/tee-talk/releases/latest">latest release</a>,
+      extract, and run. Opens a web UI in your browser, end-to-end encrypted to the TEE.
+      The first message may take a moment &mdash; the model loads on demand.
+    </p>
+
+    <p style="margin-top: 2rem;"><strong>macOS</strong></p>
+    <p class="muted">
+      macOS will block the app because it isn't signed.
+      Open <strong>System Settings &rarr; Privacy &amp; Security</strong>,
+      find the message about "tee-talk" being blocked,
+      and click <strong>Allow Anyway</strong>. Or run in Terminal:
+    </p>
+    <pre><code>xattr -d com.apple.quarantine ~/Downloads/tee-talk
+chmod +x ~/Downloads/tee-talk
+~/Downloads/tee-talk</code></pre>
+
+    <p style="margin-top: 2rem;"><strong>Windows</strong></p>
+    <p class="muted">
+      Click <strong>More info</strong> on the SmartScreen warning,
+      then <strong>Run anyway</strong>.
+    </p>
+
+    <p style="margin-top: 2rem;"><strong>Linux</strong></p>
+    <pre><code>chmod +x tee-talk
+./tee-talk</code></pre>
+
+    <p style="margin-top: 2rem;"><strong>By terminal</strong></p>
+    <pre><code>git clone https://github.com/reeeneeee/tee-talk.git
+cd tee-talk
+cargo run -- connect -a 34.170.90.128:9999</code></pre>
+    <p class="muted">
+      Requires <a href="https://rustup.rs/">Rust</a>.
+      Add <code>--trust-server</code> to skip attestation (still encrypted).
+    </p>
+
+    <p style="margin-top: 2rem;"><strong>By text message</strong> <span class="muted">(coming soon)</span></p>
+    <ol>
+      <li>
+        Text <span class="keyword">HELLO</span> to
+        <span class="phone">+1 (970) 717-2021</span>
+      </li>
+      <li>
+        You'll receive a welcome message confirming your opt-in.
+      </li>
+      <li>
+        Start the conversation.
+      </li>
+    </ol>
+    <p class="muted">
+      SMS is not end-to-end encrypted &mdash; your carrier can see messages.
+      For full encryption, use the web UI or terminal client above.
+    </p>
+
+    <h2 id="verify">How to verify</h2>
+    <p>
+      The binary running inside the TEE is built reproducibly from
+      <a href="https://github.com/reeeneeee/tee-talk">public source code</a>.
+      You can rebuild it and check that the hardware-signed attestation report
+      matches your build.
+    </p>
+    <pre><code>./scripts/build.sh
+EXPECTED_BINARY_HASH=65f221...77d \
+  cargo run -- connect -a 34.170.90.128:9999</code></pre>
+    <p class="muted">
+      Full details in <a href="https://github.com/reeeneeee/tee-talk/blob/main/VERIFY.md">VERIFY.md</a>.
+    </p>
+
+    <h2 id="faq">Frequently asked questions</h2>
+    <div class="faq">
+
+    <p><strong>What is a Trusted Execution Environment?</strong></p>
+    <p>
+      A TEE is a hardware-isolated area of a processor. Code and data inside it
+      are protected from everything outside, including the operating system,
+      the cloud provider, and anyone with physical access to the machine.
+      TEE Talk uses <a href="https://www.amd.com/en/developer/sev.html">AMD SEV-SNP</a>,
+      which encrypts all memory at the CPU level.
+    </p>
+
+    <p><strong>Can whoever's running the server read my messages?</strong></p>
+    <p>
+      No. Your messages are encrypted on your device and only decrypted inside
+      the TEE. The server operator cannot access the TEE's memory; 
+      that's enforced by the hardware.
+    </p>
+
+    <p><strong>Can't you connect to the VM and read the logs?</strong></p>
+    <p>
+      I can connect via serial port and run <code>journalctl</code>
+      to see operational <a href="https://github.com/reeeneeee/tee-talk/blob/main/src/tee.rs#L297">logs</a>,
+      not what was said. The binary is
+      <a href="https://github.com/reeeneeee/tee-talk">open source</a>, 
+      you can read the code and confirm it doesn't log your messages.
+      The hardware attestation proves the VM is running exactly the published code,
+      byte for byte. If the binary were modified to log conversations,
+      the attestation hash would change and your client would refuse to connect.
+    </p>
+
+    <p><strong>How is this different from [big LLM]?</strong></p>
+    <p>
+      When you use [big LLM], your prompts are sent to their servers and
+      processed in plain text. With TEE Talk, your prompts are encrypted
+      end-to-end and processed inside hardware isolation. No one can read them.
+    </p>
+
+    <p><strong>What AI model is running?</strong></p>
+    <p>
+      <a href="https://ollama.com/library/llama3.2:3b">Llama 3.2 3B</a>, an open-weight model by Meta. It runs locally inside the TEE
+      via <a href="https://ollama.com">Ollama</a>. No data is sent to any
+      third-party API.
+    </p>
+
+    <p><strong>What happens to my conversations?</strong></p>
+    <p>
+      Nothing is stored. When your session ends, everything disappears.
+      There are no logs, no databases, no conversation history on the server.
+    </p>
+
+    <p><strong>Why should I trust this?</strong></p>
+    <p>
+      You don't have to. The binary running in the TEE is
+      <a href="https://github.com/reeeneeee/tee-talk/blob/main/VERIFY.md">built reproducibly</a>
+      from <a href="https://github.com/reeeneeee/tee-talk">public source code</a>.
+      You can rebuild it yourself and verify that the
+      hardware-signed attestation matches.
+    </p>
+
+    <p><strong>Is the SMS option still encrypted?</strong></p>
+    <p>
+      No. SMS messages pass through your carrier in plain text. The AI still
+      runs inside the TEE, but messages between you and the server are not
+      end-to-end encrypted. For full privacy, use the desktop client or terminal.
+    </p>
+
+    <p><strong>What if my device is compromised?</strong></p>
+    <p>
+      Then all bets are off. A keylogger can read what you type before it's encrypted,
+      and stolen keys let an attacker impersonate you. TEE Talk protects your messages
+      in transit and during processing, but it can't protect a device you've already lost
+      control of. This is true of every encrypted system.
+    </p>
+
+    <p><strong>Why is this so slow?</strong></p>
+    <p>
+      The model runs on a single confidential VM with no GPU.
+      Hardware isolation sets necessary constraints on what resources can be used,
+      so responses take longer than they would on a big cloud GPU cluster.
+      A smarter model on faster hardware is on the roadmap.
+    </p>
+
+    <p><strong>How do you profit from this?</strong></p>
+    <p>
+      I don't. I pay GCP out of pocket to host the confidential VM.
+      No other company gets paid from this project.
+    </p>
+
+    </div>
+  </main>
+
+  <div class="legal" style="max-width: 540px; width: 100%; padding: 4rem 1.5rem 1rem;">
+    <p><strong>Message frequency:</strong> Varies. You only receive messages in direct response to texts you send.</p>
+    <p><strong>Message &amp; data rates may apply.</strong></p>
+    <p><strong>Opt out:</strong> Reply <span class="keyword">STOP</span> at any time to unsubscribe.</p>
+    <p><strong>Help:</strong> Reply <span class="keyword">HELP</span> for support information.</p>
+    <p>By texting HELLO, you consent to receive SMS messages from this service. You can revoke consent at any time by replying STOP.</p>
+    <p>This is not therapy or a crisis service. If you're in distress, call or text <a href="https://988lifeline.org">988</a>.</p>
+  </div>
+
+  <footer>
+    <p><a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a></p>
+    <p style="margin-top: 0.5rem;">a project by <a href="https://irena-w.xyz">irena</a> &middot; <a href="https://github.com/reeeneeee/tee-talk">source</a></p>
+  </footer>
+<script>
+  const teapot = document.getElementById('teapot');
+  const hintText = document.querySelector('.hint-text');
+
+  if ('ontouchstart' in window) {
+    // Mobile: first tap shows hint, second tap turns on lights
+    let tapped = false;
+    teapot.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (!tapped) {
+        tapped = true;
+        hintText.style.color = 'rgba(255, 243, 180, 0.25)';
+        hintText.textContent = 'select text to read';
+      } else {
+        document.body.classList.toggle('lit');
+        hintText.style.color = '';
+      }
+    });
+    // Selection also reveals
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (sel && sel.toString().length > 0) {
+        document.body.classList.add('lit');
+        hintText.style.color = '';
+      }
+    });
+  } else {
+    // Desktop: teapot doesn't toggle lights (hover + highlight work)
+  }
+
+  // Minimap: highlight current section on scroll
+  const sections = document.querySelectorAll('h2[id]');
+  const mapLinks = document.querySelectorAll('.minimap a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        mapLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector('.minimap a[href="#' + entry.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

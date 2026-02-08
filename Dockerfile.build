@@ -1,0 +1,26 @@
+FROM rust:1.85.0-slim-bookworm AS builder
+
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CARGO_INCREMENTAL=0
+ENV RUSTFLAGS="-C target-cpu=x86-64-v3 --remap-path-prefix=/build/=src/"
+
+WORKDIR /build
+
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo build --release --features real-tee 2>/dev/null || true
+RUN rm -rf src target/release/tee-talk target/release/deps/tee_talk*
+
+COPY system-prompt.txt ./
+COPY readings.txt ./
+COPY src/ src/
+RUN cargo build --release --features real-tee --locked
+
+RUN sha384sum target/release/tee-talk && sha256sum target/release/tee-talk
+
+FROM debian:bookworm-slim
+COPY --from=builder /build/target/release/tee-talk /tee-talk

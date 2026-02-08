@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: tee-talk-linux-x86_64
+            binary: tee-talk
+          - os: macos-latest
+            artifact: tee-talk-macos-arm64
+            binary: tee-talk
+          - os: windows-latest
+            artifact: tee-talk-windows-x86_64
+            binary: tee-talk.exe
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Decrypt readings (Unix)
+        if: runner.os != 'Windows'
+        run: echo "$READINGS_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --decrypt readings.txt.gpg > readings.txt
+        env:
+          READINGS_PASSPHRASE: ${{ secrets.READINGS_PASSPHRASE }}
+
+      - name: Decrypt readings (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: echo "$READINGS_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --decrypt readings.txt.gpg > readings.txt
+        env:
+          READINGS_PASSPHRASE: ${{ secrets.READINGS_PASSPHRASE }}
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: target/release/${{ matrix.binary }}

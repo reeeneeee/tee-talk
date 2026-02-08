@@ -1,0 +1,28 @@
+# tee-talk verification manifest
+#
+# This file records the expected hashes for each component in the
+# verification chain. Builders can reproduce these values independently
+# using the instructions in VERIFY.md.
+
+[build]
+rust_version = "1.85.0"
+dockerfile = "Dockerfile.build"
+cargo_locked = true
+
+[binary]
+# SHA-384 of the reproducibly-built binary (from scripts/build.sh)
+sha384 = "49d466b6136ff7bff5066c15cf9d465ab80d8a1fd4de8027cdc08bdb9c041fc5c0c3bd851b122940d93ecaf53e4553b5"
+# SHA-256 of the binary — this is what appears in report_data[32..64]
+# of the hardware-signed attestation report
+sha256 = "65f2218dda0b63a6829feca96a1968912d6050bb98a040af002711fd5d19277d"
+
+[image]
+# dm-verity root hash of the verified filesystem image
+verity_root_hash = "44c90d136e5f0edafaf2899a9b583d264c6a345c369e6ac99fc3fb713ffebecc"
+# GCP image name (set after upload)
+gcp_image = "tee-talk-verified-20260208"
+
+[model]
+name = "llama3.2:latest"
+# SHA-256 of the model weights (for optional independent verification)
+sha256 = "74701a8c35f6c8d9a4b91f3f3497643001d63e0c7a84e085bed452548fa88d45"

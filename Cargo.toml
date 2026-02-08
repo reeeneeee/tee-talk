@@ -1,0 +1,36 @@
+[package]
+name = "tee-talk"
+version = "0.1.0"
+edition = "2021"
+description = "Private LLM chat with real TEE attestation"
+
+[dependencies]
+snow = "0.9"
+tokio = { version = "1", features = ["full"] }
+sha2 = "0.10"
+hex = "0.4"
+anyhow = "1"
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+p384 = { version = "0.13", features = ["ecdsa"] }
+x509-cert = { version = "0.2", features = ["pem"] }
+der = "0.7"
+rsa = { version = "0.9", features = ["sha2"] }
+axum = "0.7"
+open = "5"
+
+# Real SEV-SNP attestation (server-side only)
+sev-snp-utilities = { version = "2", optional = true }
+
+[features]
+default = []
+server = []
+real-tee = ["sev-snp-utilities", "server"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
