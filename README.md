@@ -27,7 +27,7 @@ No app, no account. SMS is not end-to-end encrypted (your carrier can see messag
 ```bash
 git clone https://github.com/reeeneeee/tee-talk.git
 cd tee-talk
-cargo run -- connect -a 34.170.90.128:9999
+cargo run -- connect -a 34.60.196.117:9999
 ```
 
 The client performs a [Noise_XX](https://noiseprotocol.org/) handshake, verifies the AMD SEV-SNP attestation report, and establishes an encrypted channel. Everything you type is encrypted before it leaves your machine.
@@ -35,7 +35,7 @@ The client performs a [Noise_XX](https://noiseprotocol.org/) handshake, verifies
 ### Web UI (end-to-end encrypted)
 
 ```bash
-cargo run -- connect -a 34.170.90.128:9999 --web
+cargo run -- connect -a 34.60.196.117:9999 --web
 ```
 
 Opens a local web UI at `http://localhost:8080`. The browser talks to a local server on your machine; the connection to the TEE is still end-to-end encrypted.
@@ -45,7 +45,7 @@ Opens a local web UI at `http://localhost:8080`. The browser talks to a local se
 If you just want to chat and don't care about verifying the TEE:
 
 ```bash
-cargo run -- connect -a 34.170.90.128:9999 --trust-server
+cargo run -- connect -a 34.60.196.117:9999 --trust-server
 ```
 
 The connection is still end-to-end encrypted via Noise protocol — you just skip the hardware attestation check.
@@ -62,7 +62,7 @@ Quick version:
 
 # Connect and verify the TEE is running that exact binary
 EXPECTED_BINARY_HASH=65f2218dda0b63a6829feca96a1968912d6050bb98a040af002711fd5d19277d \
-  cargo run -- connect -a 34.170.90.128:9999
+  cargo run -- connect -a 34.60.196.117:9999
 ```
 
 The expected hashes are in [VERIFICATION.toml](VERIFICATION.toml).
@@ -112,6 +112,9 @@ You                          TEE (AMD SEV-SNP)
 Requires a Linux machine (or GCP VM) with Docker and sudo.
 
 ```bash
+# 0. Decrypt readings.txt (embedded in binary at compile time)
+gpg -d readings.txt.gpg > readings.txt
+
 # 1. Reproducible binary build (Docker)
 ./scripts/build.sh
 

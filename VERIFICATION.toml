@@ -18,7 +18,7 @@ sha256 = "65f2218dda0b63a6829feca96a1968912d6050bb98a040af002711fd5d19277d"
 
 [image]
 # dm-verity root hash of the verified filesystem image
-verity_root_hash = "44c90d136e5f0edafaf2899a9b583d264c6a345c369e6ac99fc3fb713ffebecc"
+verity_root_hash = "fdaa3c9959b3dbf7e1d5d2559c466a8b1cff1d5a9697008587ab3de42d36c2f6"
 # GCP image name (set after upload)
 gcp_image = "tee-talk-verified-20260208"
 

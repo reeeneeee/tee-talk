@@ -98,7 +98,7 @@ const DEFAULT_ADDR: &str = "127.0.0.1:9999";
 
 /// Public TEE server for zero-config client usage
 #[cfg(not(feature = "server"))]
-const PUBLIC_SERVER: &str = "34.170.90.128:9999";
+const PUBLIC_SERVER: &str = "34.60.196.117:9999";
 
 #[tokio::main]
 async fn main() -> Result<()> {
