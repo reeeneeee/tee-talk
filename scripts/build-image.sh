@@ -261,15 +261,16 @@ chmod 755 "$ROOT/usr/local/bin/tee-talk"
 cat > "$ROOT/etc/systemd/system/tee-talk.service" << 'EOF'
 [Unit]
 Description=tee-talk TEE Server
-After=network.target ollama.service
+After=network.target ollama.service data.mount
 Wants=ollama.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/tee-talk server --bind 0.0.0.0:9999
+ExecStart=/usr/local/bin/tee-talk server --bind 0.0.0.0:9999 --sms-port 8080
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
+EnvironmentFile=-/data/twilio.env
 
 [Install]
 WantedBy=multi-user.target

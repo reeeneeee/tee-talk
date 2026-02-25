@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text TEE Talk</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    ::selection { background: #ff5ec4; color: #000; }
+    ::-moz-selection { background: #ff5ec4; color: #000; }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #000;
+      color: #a6ff47;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.8;
+    }
+    main {
+      max-width: 540px;
+      width: 100%;
+      padding: 5rem 1.5rem 3rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: normal;
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+    p { margin-bottom: 1rem; }
+    a { color: #ff5ec4; }
+    a:hover { color: #ffcfc4; }
+    .keyword {
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+    .phone {
+      font-family: monospace;
+      font-size: 1.3rem;
+      color: #ff5ec4;
+    }
+    .cta {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      border: 1px solid rgba(166, 255, 71, 0.2);
+      border-radius: 6px;
+      text-align: center;
+    }
+    .cta p { margin-bottom: 0.5rem; }
+    .disclosures {
+      margin-top: 2.5rem;
+      font-size: 0.85rem;
+      color: rgba(166, 255, 71, 0.6);
+    }
+    .disclosures p { margin-bottom: 0.5rem; }
+    footer {
+      text-align: center;
+      padding: 2rem 1.5rem 3rem;
+      font-size: 0.8rem;
+      color: rgba(166, 255, 71, 0.25);
+    }
+    footer a { color: rgba(166, 255, 71, 0.25); text-decoration: none; }
+    footer a:hover { color: #ff5ec4; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Text TEE Talk</h1>
+
+    <p>
+      TEE Talk is a private AI chat. Your messages are processed inside a
+      hardware-isolated <a href="https://cloud.google.com/confidential-computing">Trusted Execution Environment</a> &mdash;
+      no human can read them. Send a text to start a conversation.
+    </p>
+
+    <div class="cta">
+      <p>Text <span class="keyword">HELLO</span> or <span class="keyword">START</span> to</p>
+      <p class="phone">+1 (970) 717-2021</p>
+    </div>
+
+    <p>
+      You'll receive a welcome message confirming your opt-in.
+      Then just text normally to chat with the AI.
+    </p>
+
+    <p style="font-size: 0.9rem; color: rgba(166, 255, 71, 0.6);">
+      SMS is not end-to-end encrypted &mdash; your carrier can see messages.
+      For full encryption, use the <a href="/">desktop client</a>.
+    </p>
+
+    <div class="disclosures">
+      <p><strong>Message frequency:</strong> Varies. You only receive messages in direct response to texts you send.</p>
+      <p><strong>Message &amp; data rates may apply.</strong></p>
+      <p><strong>Opt out:</strong> Reply <span class="keyword">STOP</span> at any time to unsubscribe.</p>
+      <p><strong>Help:</strong> Reply <span class="keyword">HELP</span> for support information.</p>
+      <p>By texting HELLO or START, you consent to receive SMS messages from this service. You can revoke consent at any time by replying STOP.</p>
+      <p>By opting in, you agree to our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</p>
+      <p>This is not therapy or a crisis service. If you're in distress, call or text <a href="https://988lifeline.org">988</a>.</p>
+    </div>
+  </main>
+
+  <footer>
+    <a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a>
+    <p style="margin-top: 0.5rem;"><a href="/">&larr; tee-talk.vercel.app</a></p>
+  </footer>
+</body>
+</html>

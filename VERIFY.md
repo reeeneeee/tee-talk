@@ -24,11 +24,14 @@ Client connects:
 
 ## 1. Reproduce the binary
 
-Clone the repo and run the reproducible build:
+Clone the repo and run the reproducible build on an **x86_64 Linux** machine
+(the build uses `-C target-cpu=x86-64-v3` which requires native x86_64 — it
+won't work under emulation on ARM/Apple Silicon):
 
 ```
-git clone https://github.com/irenawang/tee-talk.git
+git clone https://github.com/reeeneeee/tee-talk.git
 cd tee-talk
+gpg -d readings.txt.gpg > readings.txt
 ./scripts/build.sh
 ```
 

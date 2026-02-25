@@ -50,11 +50,11 @@ fi
 
 # Create firewall rule if it doesn't exist
 if ! gcloud compute firewall-rules describe allow-tee-talk &>/dev/null; then
-    echo "Creating firewall rule for port 9999..."
+    echo "Creating firewall rule for ports 9999 and 8080..."
     gcloud compute firewall-rules create allow-tee-talk \
-        --allow tcp:9999 \
+        --allow tcp:9999,tcp:8080 \
         --target-tags=tee-talk \
-        --description="Allow tee-talk connections"
+        --description="Allow tee-talk connections and SMS webhook"
 fi
 
 # Create Confidential VM from verified image

@@ -246,7 +246,7 @@
     }
   </style>
 </head>
-<body>
+<body class="lit">
   <ul class="minimap">
     <li><a href="#how-it-works">how it works</a></li>
     <li><a href="#how-to-talk">how to talk</a></li>
@@ -428,17 +428,18 @@ chmod +x ~/Downloads/tee-talk
     <p style="margin-top: 2rem;"><strong>By terminal</strong></p>
     <pre><code>git clone https://github.com/reeeneeee/tee-talk.git
 cd tee-talk
-cargo run -- connect -a 34.60.196.117:9999</code></pre>
+cargo run -- connect -a 34.69.2.130:9999</code></pre>
     <p class="muted">
       Requires <a href="https://rustup.rs/">Rust</a>.
       Add <code>--trust-server</code> to skip attestation (still encrypted).
     </p>
 
-    <p style="margin-top: 2rem;"><strong>By text message</strong> <span class="muted">(coming soon)</span></p>
+    <p style="margin-top: 2rem;"><strong>By text message</strong></p>
     <ol>
       <li>
-        Text <span class="keyword">HELLO</span> to
+        Text <span class="keyword">HELLO</span> or <span class="keyword">START</span> to
         <span class="phone">+1 (970) 717-2021</span>
+        (<a href="/sms">details &amp; disclosures</a>)
       </li>
       <li>
         You'll receive a welcome message confirming your opt-in.
@@ -456,12 +457,14 @@ cargo run -- connect -a 34.60.196.117:9999</code></pre>
     <p>
       The binary running inside the TEE is built reproducibly from
       <a href="https://github.com/reeeneeee/tee-talk">public source code</a>.
-      You can rebuild it and check that the hardware-signed attestation report
-      matches your build.
+      You can rebuild it on any x86_64 Linux machine with Docker and check that
+      the hardware-signed attestation report matches your build.
+      (ARM/Apple Silicon won't work &mdash; the build uses <code>target-cpu=x86-64-v3</code>.)
     </p>
-    <pre><code>./scripts/build.sh
-EXPECTED_BINARY_HASH=65f221...77d \
-  cargo run -- connect -a 34.60.196.117:9999</code></pre>
+    <pre><code>gpg -d readings.txt.gpg > readings.txt
+./scripts/build.sh
+EXPECTED_BINARY_HASH=aa8e47...17d \
+  cargo run -- connect -a 34.69.2.130:9999</code></pre>
     <p class="muted">
       Full details in <a href="https://github.com/reeeneeee/tee-talk/blob/main/VERIFY.md">VERIFY.md</a>.
     </p>
@@ -563,7 +566,8 @@ EXPECTED_BINARY_HASH=65f221...77d \
     <p><strong>Message &amp; data rates may apply.</strong></p>
     <p><strong>Opt out:</strong> Reply <span class="keyword">STOP</span> at any time to unsubscribe.</p>
     <p><strong>Help:</strong> Reply <span class="keyword">HELP</span> for support information.</p>
-    <p>By texting HELLO, you consent to receive SMS messages from this service. You can revoke consent at any time by replying STOP.</p>
+    <p>By texting HELLO or START, you consent to receive SMS messages from this service. You can revoke consent at any time by replying STOP.</p>
+    <p>By opting in, you agree to our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</p>
     <p>This is not therapy or a crisis service. If you're in distress, call or text <a href="https://988lifeline.org">988</a>.</p>
   </div>
 

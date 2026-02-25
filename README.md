@@ -27,7 +27,7 @@ No app, no account. SMS is not end-to-end encrypted (your carrier can see messag
 ```bash
 git clone https://github.com/reeeneeee/tee-talk.git
 cd tee-talk
-cargo run -- connect -a 34.60.196.117:9999
+cargo run -- connect -a 34.69.2.130:9999
 ```
 
 The client performs a [Noise_XX](https://noiseprotocol.org/) handshake, verifies the AMD SEV-SNP attestation report, and establishes an encrypted channel. Everything you type is encrypted before it leaves your machine.
@@ -35,7 +35,7 @@ The client performs a [Noise_XX](https://noiseprotocol.org/) handshake, verifies
 ### Web UI (end-to-end encrypted)
 
 ```bash
-cargo run -- connect -a 34.60.196.117:9999 --web
+cargo run -- connect -a 34.69.2.130:9999 --web
 ```
 
 Opens a local web UI at `http://localhost:8080`. The browser talks to a local server on your machine; the connection to the TEE is still end-to-end encrypted.
@@ -45,7 +45,7 @@ Opens a local web UI at `http://localhost:8080`. The browser talks to a local se
 If you just want to chat and don't care about verifying the TEE:
 
 ```bash
-cargo run -- connect -a 34.60.196.117:9999 --trust-server
+cargo run -- connect -a 34.69.2.130:9999 --trust-server
 ```
 
 The connection is still end-to-end encrypted via Noise protocol — you just skip the hardware attestation check.
@@ -54,15 +54,17 @@ The connection is still end-to-end encrypted via Noise protocol — you just ski
 
 You can cryptographically verify that the server is running the exact binary built from this source code. See [VERIFY.md](VERIFY.md) for the full verification chain.
 
-Quick version:
+Quick version (requires an x86_64 Linux machine with Docker — the build
+uses `-C target-cpu=x86-64-v3` which won't work under emulation on ARM/Apple Silicon):
 
 ```bash
-# Build the binary yourself and get its SHA-256
+# Decrypt readings.txt and build the binary
+gpg -d readings.txt.gpg > readings.txt
 ./scripts/build.sh
 
 # Connect and verify the TEE is running that exact binary
-EXPECTED_BINARY_HASH=65f2218dda0b63a6829feca96a1968912d6050bb98a040af002711fd5d19277d \
-  cargo run -- connect -a 34.60.196.117:9999
+EXPECTED_BINARY_HASH=aa8e478afdf53e67cde52ebcadc39a3a4c9976e744bde4c38c2a0bacfcb2617d \
+  cargo run -- connect -a 34.69.2.130:9999
 ```
 
 The expected hashes are in [VERIFICATION.toml](VERIFICATION.toml).
@@ -109,23 +111,23 @@ You                          TEE (AMD SEV-SNP)
 
 ## Run your own server
 
-Requires a Linux machine (or GCP VM) with Docker and sudo.
+Requires an x86_64 Linux machine with Docker and sudo.
 
 ```bash
 # 0. Decrypt readings.txt (embedded in binary at compile time)
 gpg -d readings.txt.gpg > readings.txt
 
 # 1. Reproducible binary build (Docker)
-./scripts/build.sh
+sudo ./scripts/build.sh
 
 # 2. Build dm-verity disk image (needs sudo, debootstrap, cryptsetup, etc.)
 sudo ./scripts/build-image.sh
 
 # 3. Upload to GCP as a Confidential VM image
-./scripts/upload-image.sh tee-talk-verified-v1
+./scripts/upload-image.sh tee-talk-verified-YYYYMMDD
 
 # 4. Deploy a Confidential VM from the image
-./deploy/deploy-verified.sh tee-talk-verified-v1
+./deploy/deploy-verified.sh tee-talk-verified-YYYYMMDD
 ```
 
 The model (llama3.2) is pulled automatically on first boot.
@@ -136,18 +138,17 @@ After changing the Rust code:
 
 ```bash
 # Rebuild binary (new SHA-256)
-./scripts/build.sh
+sudo ./scripts/build.sh
 
 # Rebuild disk image (new verity root hash)
 sudo ./scripts/build-image.sh
 
-# Delete old VM, upload new image, deploy
-gcloud compute instances delete tee-talk-verified --zone=us-central1-a --quiet
-./scripts/upload-image.sh tee-talk-verified-vN
-./deploy/deploy-verified.sh tee-talk-verified-vN
+# Upload new image and deploy (will prompt to delete existing VM)
+./scripts/upload-image.sh tee-talk-verified-YYYYMMDD
+./deploy/deploy-verified.sh tee-talk-verified-YYYYMMDD
 ```
 
-Then update `VERIFICATION.toml` with the new binary and verity hashes from the build output, and update the server IP in the README and website if it changed.
+Then update `VERIFICATION.toml` with the new binary and verity hashes from the build output, and update the server IP in the README, `src/main.rs`, and `site/index.html` if it changed.
 
 Changes to the website (`site/`) or README don't require a rebuild — just push to GitHub and redeploy on Vercel.
 
