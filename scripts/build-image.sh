@@ -266,7 +266,7 @@ Wants=ollama.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/tee-talk server --bind 0.0.0.0:9999 --sms-port 8080
+ExecStart=/usr/local/bin/tee-talk server --bind 0.0.0.0:9999 --real-attestation --sms-port 8080
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
