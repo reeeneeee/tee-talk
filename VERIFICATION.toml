@@ -11,16 +11,16 @@ cargo_locked = true
 
 [binary]
 # SHA-384 of the reproducibly-built binary (from scripts/build.sh)
-sha384 = "daad57485f4bef01c6d1d0a17b8e28e8a1950b0909ee7a5da096ecb53a0f2af5cc0238a2f8657ef42d7de19d74bb7f7a"
+sha384 = "8edc8c5d7b91c7d3f41d6c8586924011e4cf655ff77cc193c92b11d57881c1f5ddbb8fadff4919657c17e3fb67b13281"
 # SHA-256 of the binary — this is what appears in report_data[32..64]
 # of the hardware-signed attestation report
-sha256 = "aa8e478afdf53e67cde52ebcadc39a3a4c9976e744bde4c38c2a0bacfcb2617d"
+sha256 = "5a6994e13eb25c482614ffd2616e59aa8d876ae197a6b085865b2a97598e2073"
 
 [image]
 # dm-verity root hash of the verified filesystem image
-verity_root_hash = "d7fe396e80065b786b44a80f17432f80a04a8388199a84e1caefbb0fc31bfec8"
+verity_root_hash = "6d7ef700fac9a50e4b062e407355e4287c62ae32f485d9ef87482760ea4a0bee"
 # GCP image name (set after upload)
-gcp_image = "tee-talk-verified-20260225"
+gcp_image = "tee-talk-verified-20260226b"
 
 [model]
 name = "llama3.2:latest"
